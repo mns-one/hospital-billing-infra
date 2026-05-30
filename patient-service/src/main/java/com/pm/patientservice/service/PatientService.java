@@ -15,19 +15,26 @@ import com.pm.patientservice.dto.updatepatient.UpdatePatientRecordRequestDTO;
 import com.pm.patientservice.dto.updatepatient.UpdatePatientRecordResponseDTO;
 import com.pm.patientservice.exception.CommonException;
 import com.pm.patientservice.exception.DuplicateEmailException;
+import com.pm.patientservice.grpc.BillingServiceGrpcClient;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
 import com.pm.patientservice.utils.MapToPublicRecordDTO;
 
+import billing.BillingResponse;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PatientService {
 
     private PatientRepository repo;
     private MapToPublicRecordDTO mapper;
+    private BillingServiceGrpcClient billingServiceGrpcClient;
 
-    PatientService(PatientRepository repo, MapToPublicRecordDTO mapper){
+    PatientService(PatientRepository repo, MapToPublicRecordDTO mapper, BillingServiceGrpcClient grpcClient){
         this.repo = repo;
         this.mapper = mapper;
+        this.billingServiceGrpcClient = grpcClient;
     }
      
     // Create a new Patient record
@@ -49,6 +56,14 @@ public class PatientService {
         CreatePatientResponseDTO res = new CreatePatientResponseDTO();
         mapper.toPublicRecord(repoRecord, res);
 
+        //call billing service
+        try{
+            billingServiceGrpcClient.createBillingAccount(repoRecord.getId().toString(), repoRecord.getName(), repoRecord.getEmail());
+        }
+        catch(Exception e){
+            throw new CommonException("gRPC server connection failed");
+        }
+        
         return res;
 
     }

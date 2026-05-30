@@ -34,8 +34,17 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-password}
       DB_DRIVER: ${DB_DRIVER:-org.postgresql.Driver}
       DB_PLATFORM: ${DB_PLATFORM:-org.hibernate.dialect.PostgreSQLDialect}
+      BILLING_SERVICE_ADDRESS: ${BILLING_SERVICE_ADDRESS:-billing-service}
+      BILLING_SERVICE_GRPC_PORT: ${BILLING_SERVICE_GRPC_PORT:-9001}
     ports:
       - "8080:8080"
+    networks:
+      - default
+      - hospital
 
 volumes:
   pgdata:
+
+networks:
+  hospital:
+    external: true
