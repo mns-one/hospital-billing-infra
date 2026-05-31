@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    restart: on-failure:1  
+    environment:
+      SERVER_PORT: ${SERVER_PORT:-4003}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "4003:4003"
+    networks:
+      - hospital
+
+networks:
+  hospital:
+    external: true
+      
