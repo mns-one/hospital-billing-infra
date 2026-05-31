@@ -1,5 +1,6 @@
 package com.pm.patientservice.service;
 
+import com.pm.patientservice.kafka.kafkaProducer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -27,14 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PatientService {
 
+    private final kafkaProducer kafkaProducer;
     private PatientRepository repo;
     private MapToPublicRecordDTO mapper;
     private BillingServiceGrpcClient billingServiceGrpcClient;
 
-    PatientService(PatientRepository repo, MapToPublicRecordDTO mapper, BillingServiceGrpcClient grpcClient){
+    PatientService(PatientRepository repo, MapToPublicRecordDTO mapper, BillingServiceGrpcClient grpcClient, kafkaProducer kafkaProducer){
         this.repo = repo;
         this.mapper = mapper;
         this.billingServiceGrpcClient = grpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
      
     // Create a new Patient record
@@ -63,6 +66,9 @@ public class PatientService {
         catch(Exception e){
             throw new CommonException("gRPC server connection failed");
         }
+
+        kafkaProducer.sendEvent(repoRecord);
+        log.info("Kafka event send from service! {}", repoRecord);
         
         return res;
 
