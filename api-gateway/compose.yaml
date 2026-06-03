@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: on-failure:1
+    environment:
+      AUTH_URL: http://auth-service:4005
+    ports:
+      - "4000:4000"
+    networks:
+      - hospital
+
+networks:
+  hospital:
+    external: true
+      
