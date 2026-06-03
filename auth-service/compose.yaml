@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:17
+    container_name: auth-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${DOCKER_POSTGRES_DB}
+      POSTGRES_USER: ${DOCKER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DOCKER_POSTGRES_PASSWORD}
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-authdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 1
+
+    networks:
+      - hospital  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure:1  
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      DB_URL: ${DOCKER_POSTGRES_URL}
+      DB_USERNAME: ${DOCKER_POSTGRES_USER}
+      DB_PASSWORD: ${DOCKER_POSTGRES_PASSWORD}
+      DB_DRIVER: ${DB_DRIVER}
+      DB_PLATFORM: ${DB_PLATFORM}
+      JWT_SECRET: ${JWT_SECRET}
+
+    networks:
+      - hospital
+
+volumes:
+  pgdata:
+
+networks:
+  hospital:
+    external: true
+      
+ 
