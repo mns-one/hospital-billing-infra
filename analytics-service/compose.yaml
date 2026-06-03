@@ -8,8 +8,6 @@ services:
     environment:
       SERVER_PORT: ${SERVER_PORT:-4003}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports:
-      - "4003:4003"
     networks:
       - hospital
 

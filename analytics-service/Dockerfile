@@ -17,6 +17,5 @@ FROM eclipse-temurin:25-jre AS runner
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar ./app.jar
-EXPOSE 4003
 
 ENTRYPOINT ["java","-jar","app.jar"]
