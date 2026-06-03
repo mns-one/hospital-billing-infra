@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BillingServiceGrpcClient {
 
-    private final String serverAddress;
-    private final int serverPort;
     private final BillingServiceGrpc.BillingServiceBlockingStub blockingStub;
     
     // constuctor for grpc client
@@ -23,8 +21,6 @@ public class BillingServiceGrpcClient {
         @Value("${billing.service.address}") String serverAddress,
         @Value("${billing.service.grpc.port}") int serverPort
     ){
-        this.serverAddress = serverAddress;
-        this.serverPort = serverPort;
 
         log.info("Connecting to Billing gRPC {}:{}", serverAddress, serverPort);
 
